@@ -73,7 +73,7 @@ export default function AdminPage() {
   const markNext     = async (id: string) => { await supabase.from('questions').update({ status: 'next'      }).eq('id', id) }
   const unmarkNext   = async (id: string) => { await supabase.from('questions').update({ status: 'pending'   }).eq('id', id) }
   const markAsked    = async (id: string) => { await supabase.from('questions').update({ status: 'asked'     }).eq('id', id) }
-  const dismiss      = async (id: string) => { await supabase.from('questions').update({ status: 'deleted'   }).eq('id', id) }
+  const dismiss      = async (id: string) => { await supabase.from('questions').delete().eq('id', id) }
 
   const clearAll = async () => {
     await supabase.from('questions').update({ status: 'asked' }).eq('status', 'on_screen')
