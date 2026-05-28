@@ -8,6 +8,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export type Question = {
   id: string
   text: string
-  status: 'pending' | 'approved' | 'deleted'
+  status: 'pending' | 'approved' | 'on_screen' | 'deleted'
   created_at: string
 }
