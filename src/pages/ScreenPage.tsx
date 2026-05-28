@@ -54,18 +54,17 @@ export default function ScreenPage() {
   }, [])
 
   return (
-    <div className="bg-zinc-950 text-white flex flex-col"
-      style={{ width: '1024px', height: '760px', overflow: 'hidden' }}>
+    <div className="bg-white text-zinc-900 flex flex-col min-h-screen">
 
       {/* Header */}
       <div className="flex items-center justify-between px-10 pt-7 pb-4 flex-shrink-0">
         <div>
-          <p className="text-amber-400 text-xs font-bold tracking-[0.25em] uppercase">Alab Musika</p>
-          <h1 className="text-white text-base font-black leading-none">Live Q&A</h1>
+          <p className="text-amber-500 text-xs font-bold tracking-[0.25em] uppercase">Alab Musika</p>
+          <h1 className="text-zinc-900 text-base font-black leading-none">Live Q&A</h1>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-zinc-500 text-xs tracking-wide">Live</span>
+          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-zinc-400 text-xs tracking-wide">Live</span>
         </div>
       </div>
 
@@ -73,9 +72,9 @@ export default function ScreenPage() {
       {questions.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center px-10">
           <div className="text-5xl mb-5">🎸</div>
-          <p className="text-zinc-600 text-xl font-semibold">Waiting for questions…</p>
-          <p className="text-zinc-700 text-sm mt-2">
-            Submit at <span className="text-amber-400 font-bold">alabmusika.dricko.com</span>
+          <p className="text-zinc-400 text-xl font-semibold">Waiting for questions…</p>
+          <p className="text-zinc-400 text-sm mt-2">
+            Submit at <span className="text-amber-500 font-bold">alabmusika.dricko.com</span>
           </p>
         </div>
       ) : (
@@ -84,21 +83,21 @@ export default function ScreenPage() {
           {questions.map((q, i) => (
             <div
               key={q.id}
-              className="bg-zinc-900 rounded-2xl px-8 py-6 border border-zinc-800 animate-fade-in"
+              className="bg-zinc-50 rounded-2xl px-8 py-6 border border-zinc-200 animate-fade-in"
             >
               {/* Newest badge */}
               {i === 0 && questions.length > 1 && (
-                <span className="inline-block text-amber-400 text-xs font-bold tracking-[0.15em] uppercase mb-3">
+                <span className="inline-block text-amber-500 text-xs font-bold tracking-[0.15em] uppercase mb-3">
                   ★ Latest
                 </span>
               )}
               <p
-                className="text-white font-bold leading-snug"
-                style={{ fontSize: q.text.length > 120 ? '1.5rem' : q.text.length > 60 ? '1.9rem' : '2.4rem' }}
+                className="text-zinc-900 font-bold leading-snug"
+                style={{ fontSize: q.text.length > 120 ? '2.2rem' : q.text.length > 60 ? '2.8rem' : '3.5rem' }}
               >
                 {q.text}
               </p>
-              <p className="text-zinc-600 text-sm mt-3">{timeAgo(q.created_at)}</p>
+              <p className="text-zinc-400 text-sm mt-3">{timeAgo(q.created_at)}</p>
             </div>
           ))}
         </div>
@@ -106,8 +105,8 @@ export default function ScreenPage() {
 
       {/* Footer */}
       <div className="flex-shrink-0 pb-5 text-center">
-        <p className="text-zinc-700 text-xs">
-          Submit at <span className="text-amber-400">alabmusika.dricko.com</span>
+        <p className="text-zinc-400 text-xs">
+          Submit at <span className="text-amber-500">alabmusika.dricko.com</span>
         </p>
       </div>
     </div>
