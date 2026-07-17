@@ -41,9 +41,21 @@ export default function ScreenPage() {
             <h1 className="font-brand text-2xl font-medium leading-tight">Live Q&amp;A</h1>
           </div>
         </div>
-        <div className="font-label flex items-center gap-3 text-[10px] uppercase tracking-[.18em] text-[var(--ink-3)]">
-          <span className="h-2 w-2 bg-[var(--fire)]" /><span>Live</span>
-        </div>
+        {questions.length > 0 ? (
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="font-label mb-1 text-[10px] uppercase tracking-[.18em] text-[var(--fire)]">Scan to ask</p>
+              <p className="text-sm font-semibold text-[var(--ink)]">projectignition.dricko.com</p>
+            </div>
+            <div className="border border-[rgba(31,27,25,.2)] bg-white p-2" aria-label="QR code for submitting a question">
+              <QRCodeSVG value={QUESTION_URL} size={136} level="M" fgColor="#1F1B19" bgColor="#FFFFFF" marginSize={1} />
+            </div>
+          </div>
+        ) : (
+          <div className="font-label flex items-center gap-3 text-[10px] uppercase tracking-[.18em] text-[var(--ink-3)]">
+            <span className="h-2 w-2 bg-[var(--fire)]" /><span>Live</span>
+          </div>
+        )}
       </header>
 
       {questions.length === 0 ? (
