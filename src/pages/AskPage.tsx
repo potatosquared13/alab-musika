@@ -1,5 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+
+const COOLDOWN_SECONDS = 10
+const LAST_SUBMISSION_KEY = 'project-ignition-last-submission'
+const LAST_QUESTION_KEY = 'project-ignition-last-question'
 
 function FlameMark() {
   return (
@@ -11,15 +15,37 @@ function FlameMark() {
 
 export default function AskPage() {
   const [text, setText] = useState('')
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'done' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'done' | 'error' | 'duplicate'>('idle')
+  const [cooldown, setCooldown] = useState(0)
+
+  useEffect(() => {
+    const updateCooldown = () => {
+      const lastSubmission = Number(localStorage.getItem(LAST_SUBMISSION_KEY) || 0)
+      const remaining = Math.max(0, Math.ceil((lastSubmission + COOLDOWN_SECONDS * 1000 - Date.now()) / 1000))
+      setCooldown(remaining)
+    }
+    updateCooldown()
+    const timer = window.setInterval(updateCooldown, 250)
+    return () => window.clearInterval(timer)
+  }, [])
 
   const submit = async () => {
     const trimmed = text.trim()
-    if (!trimmed || status === 'submitting') return
+    if (!trimmed || status === 'submitting' || cooldown > 0) return
+    if (localStorage.getItem(LAST_QUESTION_KEY) === trimmed.toLocaleLowerCase()) {
+      setStatus('duplicate')
+      return
+    }
     setStatus('submitting')
     const { error } = await supabase.from('questions').insert({ text: trimmed, status: 'pending' })
     if (error) setStatus('error')
-    else { setStatus('done'); setText('') }
+    else {
+      localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString())
+      localStorage.setItem(LAST_QUESTION_KEY, trimmed.toLocaleLowerCase())
+      setCooldown(COOLDOWN_SECONDS)
+      setStatus('done')
+      setText('')
+    }
   }
 
   const handleKey = (event: React.KeyboardEvent) => {
@@ -67,18 +93,19 @@ export default function AskPage() {
               <div>
                 <div className="border border-[rgba(31,27,25,.2)] bg-[var(--bone)] p-2">
                   <label htmlFor="question" className="sr-only">Your anonymous question</label>
-                  <textarea id="question" value={text} onChange={event => setText(event.target.value)} onKeyDown={handleKey}
+                  <textarea id="question" value={text} onChange={event => { setText(event.target.value); if (status === 'duplicate') setStatus('idle') }} onKeyDown={handleKey}
                     placeholder="Write your question here…" rows={6} maxLength={280}
                     className="w-full resize-none bg-transparent px-4 pb-3 pt-4 text-lg leading-relaxed text-[var(--ink)] outline-none placeholder:text-[rgba(74,65,59,.55)] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--water)]" />
                   <div className="flex items-center justify-between border-t border-[rgba(31,27,25,.14)] px-4 py-3">
                     <span className="font-label text-[10px] tracking-[.08em] text-[var(--ink-3)]">{text.length} / 280</span>
-                    <button onClick={submit} disabled={!text.trim() || status === 'submitting'}
+                    <button onClick={submit} disabled={!text.trim() || status === 'submitting' || cooldown > 0}
                       className="min-h-11 bg-[var(--sun)] px-6 text-sm font-bold text-[var(--ink)] hover:bg-[var(--sun-deep)] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--water)] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-35">
-                      {status === 'submitting' ? 'Sending…' : 'Send question →'}
+                      {status === 'submitting' ? 'Sending…' : cooldown > 0 ? `Wait ${cooldown}s` : 'Send question →'}
                     </button>
                   </div>
                 </div>
                 {status === 'error' && <p className="mt-3 text-center text-sm font-medium text-[var(--fire)]" role="alert">Something went wrong. Please try again.</p>}
+                {status === 'duplicate' && <p className="mt-3 text-center text-sm font-medium text-[var(--fire)]" role="alert">That question was already sent. Try writing a different one.</p>}
                 <p className="font-label mt-5 text-center text-[10px] uppercase tracking-[.1em] text-[var(--ink-3)]">Questions are reviewed before they appear on screen.</p>
               </div>
             )}

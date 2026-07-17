@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 import { supabase, type Question } from '../lib/supabase'
+
+const QUESTION_URL = 'https://projectignition.dricko.com'
 
 function timeAgo(iso: string) {
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
@@ -44,11 +47,16 @@ export default function ScreenPage() {
       </header>
 
       {questions.length === 0 ? (
-        <section className="relative z-10 flex flex-1 flex-col items-center justify-center px-10 text-center">
-          <div className="mb-8 text-[var(--sun)]"><FlameMark /></div>
-          <p className="font-label mb-5 text-xs uppercase tracking-[.22em] text-[var(--sun)]">The room is open</p>
-          <h2 className="font-brand text-6xl font-light tracking-[-.03em]">Waiting for questions.</h2>
-          <p className="mt-6 text-lg text-[var(--ink-3)]">Submit at <span className="font-semibold text-[var(--ink)]">projectignition.dricko.com</span></p>
+        <section className="relative z-10 flex flex-1 items-center justify-center gap-16 px-10 text-left">
+          <div className="max-w-3xl">
+            <div className="mb-8 text-[var(--sun)]"><FlameMark /></div>
+            <p className="font-label mb-5 text-xs uppercase tracking-[.22em] text-[var(--sun)]">The room is open</p>
+            <h2 className="font-brand text-6xl font-light tracking-[-.03em]">Waiting for questions.</h2>
+            <p className="mt-6 text-lg text-[var(--ink-3)]">Scan or visit <span className="font-semibold text-[var(--ink)]">projectignition.dricko.com</span></p>
+          </div>
+          <div className="flex-shrink-0 border border-[rgba(31,27,25,.2)] bg-white p-5 shadow-[10px_10px_0_var(--bone)]" aria-label="QR code for submitting a question">
+            <QRCodeSVG value={QUESTION_URL} size={220} level="M" fgColor="#1F1B19" bgColor="#FFFFFF" marginSize={1} />
+          </div>
         </section>
       ) : (
         <section className={`relative z-10 grid flex-1 gap-5 overflow-hidden px-10 py-6 ${questions.length === 1 ? 'grid-cols-1' : 'grid-cols-1'}`}>
