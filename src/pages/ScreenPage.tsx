@@ -37,8 +37,8 @@ export default function ScreenPage() {
         <div className="flex items-center gap-4">
           <img src="/nyd-crest.png" alt="National Youth Department crest" className="h-14 w-14 object-contain" />
           <div>
-            <p className="font-label text-[10px] uppercase tracking-[.22em] text-[var(--sun)]">Project Ignition</p>
-            <h1 className="font-brand text-2xl font-medium leading-tight">Live Q&amp;A</h1>
+            <p className={`font-label uppercase tracking-[.18em] text-[var(--fire)] ${questions.length > 0 ? 'text-base font-semibold' : 'text-xs'}`}>Project Ignition</p>
+            <h1 className={`font-brand font-medium leading-tight ${questions.length > 0 ? 'text-4xl' : 'text-3xl'}`}>Live Q&amp;A</h1>
           </div>
         </div>
         {questions.length > 0 ? (
