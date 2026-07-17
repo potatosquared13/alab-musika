@@ -8,107 +8,65 @@ function timeAgo(iso: string) {
   return `${Math.floor(diff / 3600)}h ago`
 }
 
+function FlameMark() {
+  return <svg viewBox="0 0 48 56" className="h-20 w-16" fill="none" aria-hidden="true"><path d="M25 3c2 12-7 14-7 25 0 5 3 9 7 11-1-7 5-10 7-17 7 7 11 13 11 20 0 8-8 12-19 12S5 49 5 39C5 25 19 20 25 3Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
+}
+
 export default function ScreenPage() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [, setTick] = useState(0)
 
-  // Re-render every 30s so timestamps stay fresh
+  useEffect(() => { const timer = setInterval(() => setTick(n => n + 1), 30_000); return () => clearInterval(timer) }, [])
   useEffect(() => {
-    const t = setInterval(() => setTick(n => n + 1), 30_000)
-    return () => clearInterval(t)
-  }, [])
-
-  useEffect(() => {
-    supabase
-      .from('questions')
-      .select('*')
-      .eq('status', 'on_screen')
-      .order('created_at', { ascending: false })
-      .then(({ data }) => { if (data) setQuestions(data) })
-
-    const channel = supabase
-      .channel('screen-questions')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'questions' },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const q = payload.new as Question
-            if (q.status === 'on_screen') setQuestions(prev => [q, ...prev])
-          }
-          if (payload.eventType === 'UPDATE') {
-            const q = payload.new as Question
-            setQuestions(prev => {
-              const without = prev.filter(x => x.id !== q.id)
-              return q.status === 'on_screen' ? [q, ...without] : without
-            })
-          }
-          if (payload.eventType === 'DELETE') {
-            setQuestions(prev => prev.filter(x => x.id !== payload.old.id))
-          }
-        }
-      )
-      .subscribe()
-
+    supabase.from('questions').select('*').eq('status', 'on_screen').order('created_at', { ascending: false }).then(({ data }) => { if (data) setQuestions(data) })
+    const channel = supabase.channel('screen-questions').on('postgres_changes', { event: '*', schema: 'public', table: 'questions' }, payload => {
+      if (payload.eventType === 'INSERT') { const q = payload.new as Question; if (q.status === 'on_screen') setQuestions(prev => [q, ...prev]) }
+      if (payload.eventType === 'UPDATE') { const q = payload.new as Question; setQuestions(prev => { const without = prev.filter(x => x.id !== q.id); return q.status === 'on_screen' ? [q, ...without] : without }) }
+      if (payload.eventType === 'DELETE') setQuestions(prev => prev.filter(x => x.id !== payload.old.id))
+    }).subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [])
 
   return (
-    <div className="bg-white text-zinc-900 flex flex-col min-h-screen">
-
-      {/* Header */}
-      <div className="flex items-center justify-between px-10 pt-7 pb-4 flex-shrink-0">
-        <div>
-          <p className="text-amber-500 text-xs font-bold tracking-[0.25em] uppercase">Alab Musika</p>
-          <h1 className="text-zinc-900 text-base font-black leading-none">Live Q&A</h1>
+    <main className="relative flex min-h-screen flex-col overflow-hidden bg-[var(--ink)] text-[var(--crest)]">
+      <div className="brand-rays brand-rays-dark -bottom-72 -right-64" />
+      <header className="relative z-10 flex flex-shrink-0 items-center justify-between border-b border-[rgba(244,240,232,.16)] px-10 py-6">
+        <div className="flex items-center gap-4">
+          <img src="/nyd-crest.png" alt="National Youth Department crest" className="h-14 w-14 object-contain" />
+          <div>
+            <p className="font-label text-[10px] uppercase tracking-[.22em] text-[var(--sun)]">Project Ignition</p>
+            <h1 className="font-brand text-2xl font-medium leading-tight">Live Q&amp;A</h1>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-zinc-400 text-xs tracking-wide">Live</span>
+        <div className="font-label flex items-center gap-3 text-[10px] uppercase tracking-[.18em] text-[rgba(244,240,232,.6)]">
+          <span className="h-2 w-2 bg-[var(--fire)]" /><span>Live</span>
         </div>
-      </div>
+      </header>
 
-      {/* Questions area */}
       {questions.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-center px-10">
-          <div className="text-5xl mb-5">🎸</div>
-          <p className="text-zinc-400 text-xl font-semibold">Waiting for questions…</p>
-          <p className="text-zinc-400 text-sm mt-2">
-            Submit at <span className="text-amber-500 font-bold">alabmusika.dricko.com</span>
-          </p>
-        </div>
+        <section className="relative z-10 flex flex-1 flex-col items-center justify-center px-10 text-center">
+          <div className="mb-8 text-[var(--sun)]"><FlameMark /></div>
+          <p className="font-label mb-5 text-xs uppercase tracking-[.22em] text-[var(--sun)]">The room is open</p>
+          <h2 className="font-brand text-6xl font-light tracking-[-.03em]">Waiting for questions.</h2>
+          <p className="mt-6 text-lg text-[rgba(244,240,232,.62)]">Submit at <span className="font-semibold text-[var(--crest)]">projectignition.dricko.com</span></p>
+        </section>
       ) : (
-        <div className="flex-1 overflow-y-auto px-10 pb-4 space-y-4"
-          style={{ scrollbarWidth: 'none' }}>
-          {questions.map((q, i) => (
-            <div
-              key={q.id}
-              className="bg-zinc-50 rounded-2xl px-8 py-6 border border-zinc-200 animate-fade-in"
-            >
-              {/* Newest badge */}
-              {i === 0 && questions.length > 1 && (
-                <span className="inline-block text-amber-500 text-xs font-bold tracking-[0.15em] uppercase mb-3">
-                  ★ Latest
-                </span>
-              )}
-              <p
-                className="text-zinc-900 font-bold leading-snug"
-                style={{ fontSize: q.text.length > 120 ? '2.2rem' : q.text.length > 60 ? '2.8rem' : '3.5rem' }}
-              >
-                {q.text}
-              </p>
-              <p className="text-zinc-400 text-sm mt-3">{timeAgo(q.created_at)}</p>
-            </div>
+        <section className={`relative z-10 grid flex-1 gap-5 overflow-hidden px-10 py-6 ${questions.length === 1 ? 'grid-cols-1' : 'grid-cols-1'}`}>
+          {questions.map((question, index) => (
+            <article key={question.id} className="question-card flex min-h-0 flex-col justify-center border border-[rgba(244,240,232,.17)] bg-[rgba(44,39,36,.84)] px-10 py-7">
+              <div className="mb-4 flex items-center justify-between">
+                <span className="font-label text-[10px] uppercase tracking-[.2em] text-[var(--sun)]">{index === 0 && questions.length > 1 ? 'Latest question' : `Question ${questions.length - index}`}</span>
+                <span className="font-label text-[10px] tracking-[.08em] text-[rgba(244,240,232,.42)]">{timeAgo(question.created_at)}</span>
+              </div>
+              <p className="font-brand font-medium leading-[1.08] tracking-[-.025em]" style={{ fontSize: question.text.length > 120 ? '2.15rem' : question.text.length > 60 ? '2.75rem' : '3.35rem' }}>{question.text}</p>
+            </article>
           ))}
-        </div>
+        </section>
       )}
 
-      {/* Footer */}
-      <div className="flex-shrink-0 pb-5 text-center">
-        <p className="text-zinc-400 text-xs">
-          Submit at <span className="text-amber-500">alabmusika.dricko.com</span>
-        </p>
-      </div>
-    </div>
+      <footer className="font-label relative z-10 flex flex-shrink-0 items-center justify-between border-t border-[rgba(244,240,232,.16)] px-10 py-4 text-[10px] uppercase tracking-[.16em] text-[rgba(244,240,232,.46)]">
+        <span>Anonymous questions · Reviewed live</span><span>projectignition.dricko.com</span>
+      </footer>
+    </main>
   )
 }

@@ -107,7 +107,7 @@ export default function AdminPage() {
       {/* Header */}
       <div className="border-b border-zinc-800 px-6 py-4 flex items-center">
         <div>
-          <p className="text-amber-400 text-xs font-bold tracking-[0.2em] uppercase">Alab Musika</p>
+          <p className="text-amber-400 text-xs font-bold tracking-[0.2em] uppercase">Project Ignition</p>
           <h1 className="text-white text-lg font-black leading-none">Admin</h1>
         </div>
         <div className="ml-auto flex items-center gap-3">
