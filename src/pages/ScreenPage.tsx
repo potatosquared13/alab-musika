@@ -28,9 +28,9 @@ export default function ScreenPage() {
   }, [])
 
   return (
-    <main className="relative flex min-h-screen flex-col overflow-hidden bg-[var(--ink)] text-[var(--crest)]">
-      <div className="brand-rays brand-rays-dark -bottom-72 -right-64" />
-      <header className="relative z-10 flex flex-shrink-0 items-center justify-between border-b border-[rgba(244,240,232,.16)] px-10 py-6">
+    <main className="brand-grid relative flex min-h-screen flex-col overflow-hidden bg-[var(--crest)] text-[var(--ink)]">
+      <div className="brand-rays -bottom-72 -right-64" />
+      <header className="relative z-10 flex flex-shrink-0 items-center justify-between border-b border-[rgba(31,27,25,.2)] px-10 py-6">
         <div className="flex items-center gap-4">
           <img src="/nyd-crest.png" alt="National Youth Department crest" className="h-14 w-14 object-contain" />
           <div>
@@ -38,7 +38,7 @@ export default function ScreenPage() {
             <h1 className="font-brand text-2xl font-medium leading-tight">Live Q&amp;A</h1>
           </div>
         </div>
-        <div className="font-label flex items-center gap-3 text-[10px] uppercase tracking-[.18em] text-[rgba(244,240,232,.6)]">
+        <div className="font-label flex items-center gap-3 text-[10px] uppercase tracking-[.18em] text-[var(--ink-3)]">
           <span className="h-2 w-2 bg-[var(--fire)]" /><span>Live</span>
         </div>
       </header>
@@ -48,15 +48,15 @@ export default function ScreenPage() {
           <div className="mb-8 text-[var(--sun)]"><FlameMark /></div>
           <p className="font-label mb-5 text-xs uppercase tracking-[.22em] text-[var(--sun)]">The room is open</p>
           <h2 className="font-brand text-6xl font-light tracking-[-.03em]">Waiting for questions.</h2>
-          <p className="mt-6 text-lg text-[rgba(244,240,232,.62)]">Submit at <span className="font-semibold text-[var(--crest)]">projectignition.dricko.com</span></p>
+          <p className="mt-6 text-lg text-[var(--ink-3)]">Submit at <span className="font-semibold text-[var(--ink)]">projectignition.dricko.com</span></p>
         </section>
       ) : (
         <section className={`relative z-10 grid flex-1 gap-5 overflow-hidden px-10 py-6 ${questions.length === 1 ? 'grid-cols-1' : 'grid-cols-1'}`}>
           {questions.map((question, index) => (
-            <article key={question.id} className="question-card flex min-h-0 flex-col justify-center border border-[rgba(244,240,232,.17)] bg-[rgba(44,39,36,.84)] px-10 py-7">
+            <article key={question.id} className="question-card flex min-h-0 flex-col justify-center border border-[rgba(31,27,25,.18)] bg-[rgba(237,230,214,.88)] px-10 py-7">
               <div className="mb-4 flex items-center justify-between">
                 <span className="font-label text-[10px] uppercase tracking-[.2em] text-[var(--sun)]">{index === 0 && questions.length > 1 ? 'Latest question' : `Question ${questions.length - index}`}</span>
-                <span className="font-label text-[10px] tracking-[.08em] text-[rgba(244,240,232,.42)]">{timeAgo(question.created_at)}</span>
+                <span className="font-label text-[10px] tracking-[.08em] text-[var(--ink-3)]">{timeAgo(question.created_at)}</span>
               </div>
               <p className="font-brand font-medium leading-[1.08] tracking-[-.025em]" style={{ fontSize: question.text.length > 120 ? '2.15rem' : question.text.length > 60 ? '2.75rem' : '3.35rem' }}>{question.text}</p>
             </article>
@@ -64,7 +64,7 @@ export default function ScreenPage() {
         </section>
       )}
 
-      <footer className="font-label relative z-10 flex flex-shrink-0 items-center justify-between border-t border-[rgba(244,240,232,.16)] px-10 py-4 text-[10px] uppercase tracking-[.16em] text-[rgba(244,240,232,.46)]">
+      <footer className="font-label relative z-10 flex flex-shrink-0 items-center justify-between border-t border-[rgba(31,27,25,.2)] px-10 py-4 text-[10px] uppercase tracking-[.16em] text-[var(--ink-3)]">
         <span>Anonymous questions · Reviewed live</span><span>projectignition.dricko.com</span>
       </footer>
     </main>
